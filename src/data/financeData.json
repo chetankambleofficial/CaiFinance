@@ -1,0 +1,52 @@
+{
+  "user": {
+    "monthlyIncome": 25000,
+    "monthlyRent": 8000,
+    "language": "English",
+    "notifications": true
+  },
+  "expenses": [
+    {
+      "id": "1",
+      "amount": 250,
+      "category": "Food",
+      "date": "2024-01-15",
+      "note": "Lunch at restaurant",
+      "paymentType": "UPI"
+    },
+    {
+      "id": "2",
+      "amount": 50,
+      "category": "Transport",
+      "date": "2024-01-15",
+      "note": "Auto fare",
+      "paymentType": "Cash"
+    },
+    {
+      "id": "3",
+      "amount": 1200,
+      "category": "Bills",
+      "date": "2024-01-14",
+      "note": "Electricity bill",
+      "paymentType": "Online"
+    }
+  ],
+  "goals": [
+    {
+      "id": "1",
+      "name": "Emergency Fund",
+      "targetAmount": 50000,
+      "savedAmount": 15000,
+      "targetDate": "2024-12-31",
+      "category": "Emergency"
+    },
+    {
+      "id": "2",
+      "name": "New Phone",
+      "targetAmount": 25000,
+      "savedAmount": 8000,
+      "targetDate": "2024-06-30",
+      "category": "Electronics"
+    }
+  ]
+}
