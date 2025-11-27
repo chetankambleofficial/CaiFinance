@@ -1121,6 +1121,9 @@ video {
 .pr-4 {
   padding-right: 1rem;
 }
+.pb-4 {
+  padding-bottom: 1rem;
+}
 .text-left {
   text-align: left;
 }
@@ -1417,6 +1420,10 @@ body {
 }
 
 @media (min-width: 768px) {
+
+  .md\:block {
+    display: block;
+  }
 
   .md\:flex {
     display: flex;

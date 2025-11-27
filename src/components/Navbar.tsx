@@ -1,10 +1,12 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Wallet, Target, Bot, FileText, Settings } from 'lucide-react'
+import { useState } from 'react'
+import { Home, Wallet, Target, Bot, FileText, Settings, Menu, X } from 'lucide-react'
 
 export default function Navbar() {
   const pathname = usePathname()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   
   const navItems = [
     { href: '/dashboard', icon: Home, label: 'Dashboard' },
@@ -46,17 +48,50 @@ export default function Navbar() {
                 localStorage.removeItem('currentUser')
                 window.location.href = '/auth'
               }}
-              className="px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-all text-red-400 text-sm"
+              className="hidden md:block px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-all text-red-400 text-sm"
             >
               Logout
             </button>
-            <div className="md:hidden">
-              <button className="p-2 rounded-lg bg-white/10">
-                <Settings className="w-6 h-6" />
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden p-2 rounded-lg bg-white/10"
+            >
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+        
+        {isMenuOpen && (
+          <div className="md:hidden mt-4 pb-4">
+            <div className="flex flex-col space-y-2">
+              {navItems.map(({ href, icon: Icon, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-all ${
+                    pathname === href
+                      ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                      : 'hover:bg-white/10 text-gray-300 hover:text-white'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {label}
+                </Link>
+              ))}
+              <button
+                onClick={() => {
+                  localStorage.removeItem('currentUser')
+                  window.location.href = '/auth'
+                }}
+                className="flex items-center gap-2 px-4 py-3 bg-red-500/20 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-all text-red-400"
+              >
+                <Settings className="w-4 h-4" />
+                Logout
               </button>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </nav>
   )
