@@ -54,7 +54,7 @@ export default function Navbar() {
             </button>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-lg bg-white/10"
+              className="block md:hidden p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all"
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -62,8 +62,8 @@ export default function Navbar() {
         </div>
         
         {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4">
-            <div className="flex flex-col space-y-2">
+          <div className="block md:hidden mt-4 pb-4 border-t border-white/10">
+            <div className="flex flex-col space-y-2 pt-4">
               {navItems.map(({ href, icon: Icon, label }) => (
                 <Link
                   key={href}
