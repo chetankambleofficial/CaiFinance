@@ -180,7 +180,7 @@ export default function AIAdvice() {
                         : 'bg-gray-800/50 border border-gray-600/30'
                     }`}>
                       <p className="text-sm">{message.content}</p>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 mt-1" suppressHydrationWarning>
                         {message.timestamp.toLocaleTimeString()}
                       </p>
                     </div>
