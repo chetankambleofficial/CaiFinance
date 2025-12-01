@@ -38,7 +38,7 @@ export default function Dashboard() {
     setExpenses(chartData)
     
     // Generate AI insights
-    const analysis = analyzeSpending(data.expenses, data.user.monthlyIncome, data.user.monthlyRent)
+    const analysis = analyzeSpending(data.expenses as any, data.user.monthlyIncome, data.user.monthlyRent)
     const advice = generateAdvice(analysis)
     setAiInsights({ analysis, advice })
   }

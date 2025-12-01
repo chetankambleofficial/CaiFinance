@@ -1,7 +1,7 @@
 import { Expense, Budget, AIInsight } from '@/types'
 
 // New functions for dashboard AI analysis
-export function analyzeSpending(expenses: Expense[], monthlyIncome: number, monthlyRent: number) {
+export function analyzeSpending(expenses: any[], monthlyIncome: number, monthlyRent: number) {
   const categoryTotals = expenses.reduce((acc: any, exp: any) => {
     acc[exp.category] = (acc[exp.category] || 0) + exp.amount
     return acc
