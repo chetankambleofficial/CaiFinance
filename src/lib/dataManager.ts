@@ -7,6 +7,10 @@ export interface FinanceData {
     language: string
     notifications: boolean
     budgets?: Record<string, number>
+    incomes?: any[]
+    investments?: any[]
+    loans?: any[]
+    subscriptions?: any[]
   }
   expenses: Array<{
     id: string
