@@ -6,6 +6,7 @@ export interface FinanceData {
     monthlyRent: number
     language: string
     notifications: boolean
+    budgets?: Record<string, number>
   }
   expenses: Array<{
     id: string
@@ -79,4 +80,16 @@ export const getCurrentUser = () => {
 
 export const logout = () => {
   localStorage.removeItem('currentUser')
+}
+
+export const updateBudget = (budgets: Record<string, number>) => {
+  data.user = { ...data.user, budgets }
+  saveUserData()
+  return data
+}
+
+export const updateUserProfile = (updates: any) => {
+  data.user = { ...data.user, ...updates }
+  saveUserData()
+  return data
 }

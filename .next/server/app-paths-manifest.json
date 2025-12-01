@@ -1,7 +1,12 @@
 {
-  "/dashboard/page": "app/dashboard/page.js",
-  "/auth/page": "app/auth/page.js",
+  "/not-found": "app/not-found.js",
+  "/subscriptions/page": "app/subscriptions/page.js",
+  "/ai-advice/page": "app/ai-advice/page.js",
   "/settings/page": "app/settings/page.js",
-  "/expenses/page": "app/expenses/page.js",
-  "/goals/page": "app/goals/page.js"
+  "/investments/page": "app/investments/page.js",
+  "/loans/page": "app/loans/page.js",
+  "/budget/page": "app/budget/page.js",
+  "/goals/page": "app/goals/page.js",
+  "/reports/page": "app/reports/page.js",
+  "/income/page": "app/income/page.js"
 }
