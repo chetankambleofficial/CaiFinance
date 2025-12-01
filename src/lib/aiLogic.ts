@@ -149,7 +149,7 @@ export class AIFinancialAdvisor {
   }
   
   // Generate personalized advice based on spending patterns
-  static generatePersonalizedAdvice(expenses: Expense[], monthlyIncome: number): string {
+  static generatePersonalizedAdvice(expenses: any[], monthlyIncome: number): string {
     const categorySpending = this.getCategorySpending(expenses)
     const totalSpending = Object.values(categorySpending).reduce((sum, amount) => sum + amount, 0)
     const savingsRate = ((monthlyIncome - totalSpending) / monthlyIncome) * 100
