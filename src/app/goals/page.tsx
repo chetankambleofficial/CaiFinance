@@ -64,27 +64,25 @@ export default function Goals() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-              Savings Goals
-            </h1>
-            <p className="text-gray-400">Track your financial goals and progress</p>
+            <h1 className="text-3xl font-normal text-gray-900 mb-2">Savings Goals</h1>
+            <p className="text-gray-600">Track your financial goals and progress</p>
           </div>
           <button
             onClick={() => setShowForm(true)}
-            className="bg-purple-500/20 border border-purple-500/30 rounded-lg px-6 py-3 hover:bg-purple-500/30 transition-all flex items-center gap-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4" />
             Add Goal
           </button>
         </div>
 
         {/* Goals Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {goals.map((goal) => {
             const progress = getProgressPercentage(goal.savedAmount, goal.targetAmount)
             const daysRemaining = getDaysRemaining(goal.targetDate)
@@ -93,63 +91,63 @@ export default function Goals() {
             const canAfford = availableSavings >= monthlyTarget
 
             return (
-              <div key={goal.id} className="bg-black/40 backdrop-blur-lg border border-white/10 rounded-xl p-6">
+              <div key={goal.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg flex items-center justify-center">
-                    <Target className="w-6 h-6 text-white" />
+                  <div className="bg-blue-50 w-12 h-12 rounded-lg flex items-center justify-center">
+                    <Target className="w-6 h-6 text-blue-600" />
                   </div>
-                  <span className="px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full">
+                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
                     {goal.category}
                   </span>
                 </div>
 
-                <h3 className="text-xl font-bold mb-2">{goal.name}</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">{goal.name}</h3>
                 
                 <div className="mb-4">
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-400">Progress</span>
-                    <span className="text-purple-400">{progress.toFixed(0)}%</span>
+                    <span className="text-gray-600">Progress</span>
+                    <span className="text-blue-600 font-medium">{progress.toFixed(0)}%</span>
                   </div>
-                  <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
-                      className="h-full bg-gradient-to-r from-purple-400 to-pink-500 rounded-full transition-all duration-500"
+                      className="h-2 bg-blue-600 rounded-full transition-all duration-500"
                       style={{ width: `${progress}%` }}
                     ></div>
                   </div>
                 </div>
 
-                <div className="space-y-2 text-sm">
+                <div className="space-y-2 text-sm mb-4">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Saved:</span>
-                    <span className="text-green-400">₹{goal.savedAmount.toLocaleString()}</span>
+                    <span className="text-gray-600">Saved:</span>
+                    <span className="text-green-600 font-medium">₹{goal.savedAmount.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Target:</span>
-                    <span className="text-blue-400">₹{goal.targetAmount.toLocaleString()}</span>
+                    <span className="text-gray-600">Target:</span>
+                    <span className="text-blue-600 font-medium">₹{goal.targetAmount.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Remaining:</span>
-                    <span className="text-red-400">₹{(goal.targetAmount - goal.savedAmount).toLocaleString()}</span>
+                    <span className="text-gray-600">Remaining:</span>
+                    <span className="text-gray-900 font-medium">₹{(goal.targetAmount - goal.savedAmount).toLocaleString()}</span>
                   </div>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-white/10">
+                <div className="pt-4 border-t border-gray-200">
                   <div className="flex items-center justify-between text-sm mb-2">
-                    <div className="flex items-center gap-1 text-gray-400">
+                    <div className="flex items-center gap-1 text-gray-600">
                       <Calendar className="w-4 h-4" />
                       {daysRemaining > 0 ? `${daysRemaining} days left` : 'Overdue'}
                     </div>
-                    <div className={canAfford ? 'text-green-400' : 'text-red-400'}>
+                    <div className={canAfford ? 'text-green-600' : 'text-red-600'}>
                       ₹{monthlyTarget}/month
                     </div>
                   </div>
                   <div className="text-xs text-gray-500">
-                    Available savings: ₹{availableSavings}/month
-                    {!canAfford && <span className="text-red-400 ml-2">⚠️ Insufficient funds</span>}
+                    Available: ₹{availableSavings}/month
+                    {!canAfford && <span className="text-red-600 ml-2">⚠️ Insufficient funds</span>}
                   </div>
                 </div>
 
-                <button className="w-full mt-4 bg-purple-500/20 border border-purple-500/30 rounded-lg py-2 hover:bg-purple-500/30 transition-all">
+                <button className="w-full mt-4 bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 rounded-lg transition-colors">
                   Add Money
                 </button>
               </div>
@@ -159,89 +157,103 @@ export default function Goals() {
 
         {/* Add Goal Form */}
         {showForm && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-black/80 backdrop-blur-lg border border-white/20 rounded-xl p-6 w-full max-w-md mx-4">
-              <h3 className="text-xl font-bold mb-4 text-purple-400">Add New Goal</h3>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Goal Name</label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-2 focus:border-purple-400 focus:outline-none"
-                    placeholder="e.g., Emergency Fund"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Target Amount (₹)</label>
-                  <input
-                    type="number"
-                    value={formData.targetAmount}
-                    onChange={(e) => setFormData({...formData, targetAmount: e.target.value})}
-                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-2 focus:border-purple-400 focus:outline-none"
-                    placeholder="50000"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Target Date</label>
-                  <input
-                    type="date"
-                    value={formData.targetDate}
-                    onChange={(e) => setFormData({...formData, targetDate: e.target.value})}
-                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-2 focus:border-purple-400 focus:outline-none"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Category</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-2 focus:border-purple-400 focus:outline-none"
-                  >
-                    {categories.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="submit"
-                    className="flex-1 bg-purple-500/20 border border-purple-500/30 rounded-lg py-2 hover:bg-purple-500/30 transition-all"
-                  >
-                    Create Goal
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowForm(false)}
-                    className="flex-1 bg-gray-500/20 border border-gray-500/30 rounded-lg py-2 hover:bg-gray-500/30 transition-all"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
+              <div className="p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Add New Goal</h3>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Goal Name</label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="e.g., Emergency Fund"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Target Amount (₹)</label>
+                    <input
+                      type="number"
+                      value={formData.targetAmount}
+                      onChange={(e) => setFormData({...formData, targetAmount: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="50000"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Target Date</label>
+                    <input
+                      type="date"
+                      value={formData.targetDate}
+                      onChange={(e) => setFormData({...formData, targetDate: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData({...formData, category: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      {categories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors"
+                    >
+                      Create Goal
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowForm(false)}
+                      className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         )}
 
         {/* AI Suggestions */}
-        <div className="mt-8 bg-black/40 backdrop-blur-lg border border-blue-500/20 rounded-xl p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center mb-4">
-            <TrendingUp className="w-6 h-6 text-blue-400 mr-2" />
-            <h3 className="text-xl font-bold text-blue-400">AI Goal Suggestions</h3>
+            <TrendingUp className="w-6 h-6 text-blue-600 mr-3" />
+            <h3 className="text-lg font-medium text-gray-900">AI Goal Insights</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-              <p className="text-sm">💡 <strong>Income Analysis:</strong> With ₹{monthlyIncome.toLocaleString()} monthly income and ₹{totalExpenses.toLocaleString()} expenses, you have ₹{(monthlyIncome - totalExpenses).toLocaleString()} available for goals.</p>
+            <div className="bg-blue-50 rounded-lg p-4">
+              <p className="text-sm text-gray-700">
+                <strong>Income Analysis:</strong> With ₹{monthlyIncome.toLocaleString()} monthly income and ₹{totalExpenses.toLocaleString()} expenses, you have ₹{(monthlyIncome - totalExpenses).toLocaleString()} available for goals.
+              </p>
             </div>
-            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-              <p className="text-sm">✅ <strong>Smart Tip:</strong> {monthlyIncome - totalExpenses > 5000 ? 'Great! You have good savings potential.' : 'Consider reducing expenses to increase goal savings.'}</p>
+            <div className="bg-green-50 rounded-lg p-4">
+              <p className="text-sm text-gray-700">
+                <strong>Smart Tip:</strong> {monthlyIncome - totalExpenses > 5000 ? 'Great! You have good savings potential.' : 'Consider reducing expenses to increase goal savings.'}
+              </p>
             </div>
           </div>
         </div>
+
+        {goals.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">🎯</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No goals set yet</h3>
+            <p className="text-gray-600">Start your financial journey by creating your first savings goal</p>
+          </div>
+        )}
       </div>
     </div>
   )

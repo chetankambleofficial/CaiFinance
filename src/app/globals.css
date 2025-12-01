@@ -15,7 +15,7 @@ html {
 }
 
 body {
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+  background: #f9fafb;
   min-height: 100vh;
 }
 
@@ -25,16 +25,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a2e;
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #00ff88, #0099ff);
+  background: #cbd5e1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(45deg, #0099ff, #8800ff);
+  background: #94a3b8;
 }
 
 /* Glass morphism */

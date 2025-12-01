@@ -72,3 +72,11 @@ export const deleteExpense = (id: string) => {
   saveUserData()
   return data
 }
+
+export const getCurrentUser = () => {
+  return JSON.parse(localStorage.getItem('currentUser') || 'null')
+}
+
+export const logout = () => {
+  localStorage.removeItem('currentUser')
+}

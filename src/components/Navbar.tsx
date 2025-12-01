@@ -2,109 +2,133 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { Home, Wallet, Target, Bot, FileText, Settings, Menu, X } from 'lucide-react'
+import { Home, Wallet, Target, Bot, Settings, Menu, X, LogOut, User, DollarSign } from 'lucide-react'
+import { getCurrentUser, logout } from '@/lib/dataManager'
 
 export default function Navbar() {
   const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768)
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    const currentUser = getCurrentUser()
+    setUser(currentUser)
   }, [])
+
+  const handleLogout = () => {
+    logout()
+    window.location.href = '/auth'
+  }
   
   const navItems = [
     { href: '/dashboard', icon: Home, label: 'Dashboard' },
     { href: '/expenses', icon: Wallet, label: 'Expenses' },
     { href: '/goals', icon: Target, label: 'Goals' },
-    { href: '/ai-advice', icon: Bot, label: 'AI Advice' },
-    { href: '/reports', icon: FileText, label: 'Reports' },
+    { href: '/ai-advice', icon: Bot, label: 'AI Advisor' },
     { href: '/settings', icon: Settings, label: 'Settings' }
   ]
   
   return (
-    <nav className="fixed top-0 w-full z-50 bg-black/40 backdrop-blur-lg border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex justify-between items-center">
-          <Link href="/dashboard" className="text-2xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
-            CAI Finance
+    <header className="bg-white shadow-sm border-b border-gray-100">
+      <div className="px-6 py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/dashboard" className="flex items-center space-x-3">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg">
+              <DollarSign className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">CAI Finance</h1>
+              <p className="text-xs text-gray-500 -mt-1">Smart Money Management</p>
+            </div>
           </Link>
           
-          <div className="hidden md:flex space-x-6">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-2">
             {navItems.map(({ href, icon: Icon, label }) => (
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                   pathname === href
-                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                    : 'hover:bg-white/10 text-gray-300 hover:text-white'
+                    ? 'bg-blue-50 text-blue-700 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
                 <Icon className="w-4 h-4" />
                 {label}
               </Link>
             ))}
-          </div>
+          </nav>
           
-          <div className="flex items-center gap-4">
-            {!isMobile && (
+          {/* Right Section */}
+          <div className="flex items-center space-x-4">
+            {/* Desktop User Menu */}
+            <div className="hidden lg:flex items-center space-x-3">
+              <div className="flex items-center space-x-3 px-4 py-2 bg-gray-50 rounded-xl">
+                <div className="bg-blue-100 w-8 h-8 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-blue-600" />
+                </div>
+                <span className="text-sm font-medium text-gray-700">{user?.name || 'Guest User'}</span>
+              </div>
               <button
-                onClick={() => {
-                  localStorage.removeItem('currentUser')
-                  window.location.href = '/auth'
-                }}
-                className="px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-all text-red-400 text-sm"
+                onClick={handleLogout}
+                className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all duration-200"
               >
-                Logout
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
               </button>
-            )}
-            {isMobile && (
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all"
-              >
-                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            )}
+            </div>
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="lg:hidden p-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+            >
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
         
+        {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="block md:hidden mt-4 pb-4 border-t border-white/10">
-            <div className="flex flex-col space-y-2 pt-4">
+          <div className="lg:hidden mt-4 pt-4 border-t border-gray-100">
+            <div className="space-y-2">
               {navItems.map(({ href, icon: Icon, label }) => (
                 <Link
                   key={href}
                   href={href}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-all ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
                     pathname === href
-                      ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                      : 'hover:bg-white/10 text-gray-300 hover:text-white'
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-5 h-5" />
                   {label}
                 </Link>
               ))}
-              <button
-                onClick={() => {
-                  localStorage.removeItem('currentUser')
-                  window.location.href = '/auth'
-                }}
-                className="flex items-center gap-2 px-4 py-3 bg-red-500/20 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-all text-red-400"
-              >
-                <Settings className="w-4 h-4" />
-                Logout
-              </button>
+              
+              <div className="border-t border-gray-100 pt-4 mt-4">
+                <div className="flex items-center px-4 py-3 mb-2 bg-gray-50 rounded-xl">
+                  <div className="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                    <User className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <span className="font-medium text-gray-900">{user?.name || 'Guest User'}</span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                >
+                  <LogOut className="w-5 h-5 mr-3" />
+                  <span className="font-medium">Logout</span>
+                </button>
+              </div>
             </div>
           </div>
         )}
       </div>
-    </nav>
+    </header>
   )
 }

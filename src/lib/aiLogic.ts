@@ -1,5 +1,80 @@
 import { Expense, Budget, AIInsight } from '@/types'
 
+// New functions for dashboard AI analysis
+export function analyzeSpending(expenses: Expense[], monthlyIncome: number, monthlyRent: number) {
+  const categoryTotals = expenses.reduce((acc: any, exp: any) => {
+    acc[exp.category] = (acc[exp.category] || 0) + exp.amount
+    return acc
+  }, {})
+  
+  const totalExpenses = Object.values(categoryTotals).reduce((sum: any, amount: any) => sum + amount, 0) + monthlyRent
+  const savings = monthlyIncome - totalExpenses
+  const savingsRate = Math.round((savings / monthlyIncome) * 100)
+  
+  const highestCategory = Object.entries(categoryTotals)
+    .sort(([,a]: any, [,b]: any) => b - a)[0]?.[0] || 'Rent'
+  
+  let healthScore = 0
+  
+  // Savings rate scoring (0-5 points)
+  if (savingsRate >= 20) healthScore += 5
+  else if (savingsRate >= 15) healthScore += 4
+  else if (savingsRate >= 10) healthScore += 3
+  else if (savingsRate >= 5) healthScore += 2
+  else if (savingsRate >= 0) healthScore += 1
+  
+  // Food spending control (0-3 points)
+  const foodPercentage = (categoryTotals['Food'] || 0) / monthlyIncome * 100
+  if (foodPercentage <= 20) healthScore += 3
+  else if (foodPercentage <= 25) healthScore += 2
+  else if (foodPercentage <= 30) healthScore += 1
+  
+  // Overall expense control (0-2 points)
+  const expenseRatio = totalExpenses / monthlyIncome
+  if (expenseRatio <= 0.7) healthScore += 2
+  else if (expenseRatio <= 0.8) healthScore += 1
+  
+  // Ensure minimum score of 1
+  healthScore = Math.max(healthScore, 1)
+  
+  return {
+    savingsRate,
+    highestCategory,
+    healthScore: Math.min(healthScore, 10),
+    totalExpenses,
+    savings
+  }
+}
+
+export function generateAdvice(analysis: any): string[] {
+  const advice = []
+  
+  if (analysis.savingsRate < 0) {
+    advice.push('⚠️ You are spending more than you earn! Cut expenses immediately.')
+  } else if (analysis.savingsRate < 5) {
+    advice.push('Your savings rate is very low. Try to save at least 5% of income.')
+  } else if (analysis.savingsRate < 10) {
+    advice.push('Try to save at least 10% of your income. Start by reducing one small expense daily.')
+  } else if (analysis.savingsRate >= 20) {
+    advice.push('Excellent savings rate! Consider investing your surplus in SIP or fixed deposits.')
+  }
+  
+  if (analysis.highestCategory === 'Food') {
+    advice.push('Food is your biggest expense. Try cooking at home 2 more days per week to save money.')
+  }
+  
+  if (analysis.healthScore <= 4) {
+    advice.push('🚨 Your financial health needs urgent attention. Focus on cutting expenses.')
+  } else if (analysis.healthScore <= 6) {
+    advice.push('Your finances need improvement. Focus on increasing savings rate.')
+  }
+  
+  advice.push('Track daily expenses to identify small spending leaks in your budget.')
+  advice.push('Set up automatic savings to build wealth consistently over time.')
+  
+  return advice
+}
+
 export class AIFinancialAdvisor {
   
   // Analyze spending patterns and generate insights

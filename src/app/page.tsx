@@ -15,7 +15,7 @@ export default function Home() {
   }, [router])
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white flex items-center justify-center">
+    <div className="min-h-screen  text-white flex items-center justify-center">
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
           CAI Finance

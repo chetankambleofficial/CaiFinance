@@ -1,22 +1,22 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts'
-import { Wallet, TrendingUp, Target, AlertTriangle, Bot } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { Wallet, Plus, Target, Download, TrendingUp, Brain, CheckCircle } from 'lucide-react'
 import { getFinanceData } from '@/lib/dataManager'
-
-const COLORS = ['#00ff88', '#0088ff', '#8800ff', '#ff0088', '#ffaa00']
+import { analyzeSpending, generateAdvice } from '@/lib/aiLogic'
 
 export default function Dashboard() {
+  const [mounted, setMounted] = useState(false)
   const [expenses, setExpenses] = useState([
-    { name: 'Food', value: 3400, color: '#00ff88' },
-    { name: 'Transport', value: 1200, color: '#0088ff' },
-    { name: 'Bills', value: 2800, color: '#8800ff' },
-    { name: 'Shopping', value: 1400, color: '#ff0088' },
-    { name: 'Rent', value: 8000, color: '#aa00ff' }
+    { name: 'Food', value: 3400, color: '#4285f4' },
+    { name: 'Transport', value: 1200, color: '#34a853' },
+    { name: 'Bills', value: 2800, color: '#fbbc04' },
+    { name: 'Rent', value: 8000, color: '#ea4335' }
   ])
 
   const [monthlyIncome, setMonthlyIncome] = useState(25000)
   const [monthlyRent, setMonthlyRent] = useState(8000)
+  const [aiInsights, setAiInsights] = useState<any>(null)
 
   const loadData = () => {
     const data = getFinanceData()
@@ -31,217 +31,270 @@ export default function Dashboard() {
     const chartData = Object.entries(categoryTotals).map(([name, value], index) => ({
       name,
       value: value as number,
-      color: ['#00ff88', '#0088ff', '#8800ff', '#ff0088', '#aa00ff'][index % 5]
+      color: ['#4285f4', '#34a853', '#fbbc04', '#ea4335'][index % 4]
     }))
     
-    chartData.push({ name: 'Rent', value: data.user.monthlyRent, color: '#aa00ff' })
+    chartData.push({ name: 'Rent', value: data.user.monthlyRent, color: '#ea4335' })
     setExpenses(chartData)
+    
+    // Generate AI insights
+    const analysis = analyzeSpending(data.expenses, data.user.monthlyIncome, data.user.monthlyRent)
+    const advice = generateAdvice(analysis)
+    setAiInsights({ analysis, advice })
   }
 
   useEffect(() => {
+    setMounted(true)
     loadData()
-    
-    const handleStorageChange = () => loadData()
-    window.addEventListener('storage', handleStorageChange)
-    
-    return () => window.removeEventListener('storage', handleStorageChange)
   }, [])
 
-  const [monthlyData] = useState([
-    { month: 'Jan', income: monthlyIncome, expenses: 18000 },
-    { month: 'Feb', income: monthlyIncome, expenses: 19500 },
-    { month: 'Mar', income: monthlyIncome, expenses: 17800 }
-  ])
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="animate-pulse">
+            <div className="h-12 bg-gray-200 rounded-lg w-1/3 mx-auto mb-4"></div>
+            <div className="h-6 bg-gray-200 rounded w-1/4 mx-auto mb-12"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <div className="h-32 bg-gray-200 rounded-lg"></div>
+              <div className="h-32 bg-gray-200 rounded-lg"></div>
+              <div className="h-32 bg-gray-200 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const totalExpenses = expenses.reduce((sum, item) => sum + item.value, 0)
   const savings = monthlyIncome - totalExpenses
 
   const downloadReport = async () => {
     const { jsPDF } = await import('jspdf')
-    const data = getFinanceData()
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}')
-    
     const doc = new jsPDF()
-    
-    // Header
     doc.setFontSize(20)
-    doc.text('CAI Finance - Monthly Report', 20, 30)
-    
+    doc.text('CAI Finance Report', 20, 30)
     doc.setFontSize(12)
-    doc.text(`User: ${currentUser.name || 'User'}`, 20, 50)
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 60)
-    
-    // Financial Summary
-    doc.setFontSize(16)
-    doc.text('FINANCIAL SUMMARY', 20, 80)
-    
-    doc.setFontSize(12)
-    doc.text(`Monthly Income: Rs.${monthlyIncome.toLocaleString()}`, 20, 100)
-    doc.text(`Total Expenses: Rs.${totalExpenses.toLocaleString()}`, 20, 110)
-    doc.text(`Net Savings: Rs.${savings.toLocaleString()}`, 20, 120)
-    doc.text(`Savings Rate: ${((savings / monthlyIncome) * 100).toFixed(1)}%`, 20, 130)
-    
-    // Expense Breakdown
-    doc.setFontSize(16)
-    doc.text('EXPENSE BREAKDOWN', 20, 150)
-    
-    doc.setFontSize(12)
-    let yPos = 170
-    expenses.forEach(exp => {
-      doc.text(`${exp.name}: Rs.${exp.value.toLocaleString()}`, 20, yPos)
-      yPos += 10
-    })
-    
-    // AI Insights
-    doc.setFontSize(16)
-    doc.text('AI INSIGHTS', 20, yPos + 20)
-    
-    doc.setFontSize(12)
-    yPos += 40
-    doc.text(`Your savings rate is ${((savings / monthlyIncome) * 100).toFixed(1)}%`, 20, yPos)
-    yPos += 10
-    doc.text(savings > 0 ? 'Good job maintaining positive savings!' : 'Consider reducing expenses.', 20, yPos)
-    yPos += 10
-    doc.text('Focus on largest expense categories for optimization', 20, yPos)
-    
-    // Footer
-    doc.setFontSize(10)
-    doc.text('Generated by CAI Finance App', 20, 280)
-    
+    doc.text(`Income: Rs.${monthlyIncome.toLocaleString()}`, 20, 50)
+    doc.text(`Expenses: Rs.${totalExpenses.toLocaleString()}`, 20, 60)
+    doc.text(`Savings: Rs.${savings.toLocaleString()}`, 20, 70)
     doc.save(`finance-report-${new Date().toISOString().split('T')[0]}.pdf`)
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
-            CAI Finance Dashboard
-          </h1>
-          <p className="text-gray-400">AI-Powered Personal Finance Manager for Citizens</p>
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-normal text-gray-900 mb-2">Finance Dashboard</h1>
+          <p className="text-gray-600 text-lg">Manage your money with AI insights</p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-black/40 backdrop-blur-lg border border-green-500/20 rounded-xl p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Monthly Income</p>
-                <p className="text-2xl font-bold text-green-400">₹{monthlyIncome.toLocaleString()}</p>
+        {/* Main Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="bg-green-50 p-3 rounded-full mr-4">
+                <Wallet className="w-6 h-6 text-green-600" />
               </div>
-              <Wallet className="w-8 h-8 text-green-400" />
+              <div>
+                <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Monthly Income</p>
+                <p className="text-2xl font-normal text-gray-900">₹{monthlyIncome.toLocaleString()}</p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-black/40 backdrop-blur-lg border border-red-500/20 rounded-xl p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Total Expenses</p>
-                <p className="text-2xl font-bold text-red-400">₹{totalExpenses.toLocaleString()}</p>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="bg-red-50 p-3 rounded-full mr-4">
+                <TrendingUp className="w-6 h-6 text-red-600" />
               </div>
-              <TrendingUp className="w-8 h-8 text-red-400" />
+              <div>
+                <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Total Expenses</p>
+                <p className="text-2xl font-normal text-gray-900">₹{totalExpenses.toLocaleString()}</p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-black/40 backdrop-blur-lg border border-blue-500/20 rounded-xl p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Savings</p>
-                <p className="text-2xl font-bold text-blue-400">₹{savings.toLocaleString()}</p>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="bg-blue-50 p-3 rounded-full mr-4">
+                <Target className="w-6 h-6 text-blue-600" />
               </div>
-              <Target className="w-8 h-8 text-blue-400" />
-            </div>
-          </div>
-
-          <div className="bg-black/40 backdrop-blur-lg border border-yellow-500/20 rounded-xl p-6">
-            <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">Budget Left</p>
-                <p className="text-2xl font-bold text-yellow-400">₹{(monthlyIncome * 0.8 - totalExpenses).toLocaleString()}</p>
+                <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Net Savings</p>
+                <p className="text-2xl font-normal text-gray-900">₹{savings.toLocaleString()}</p>
               </div>
-              <AlertTriangle className="w-8 h-8 text-yellow-400" />
             </div>
           </div>
         </div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Expense Breakdown */}
-          <div className="bg-black/40 backdrop-blur-lg border border-white/10 rounded-xl p-6">
-            <h3 className="text-xl font-bold mb-4 text-green-400">Expense Breakdown</h3>
-            <div className="h-64">
+        {/* Expense Chart & AI Tips */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* Bar Chart */}
+          <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+            <h3 className="text-xl font-medium text-gray-900 mb-6">Monthly Expense Breakdown</h3>
+            <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={expenses}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {expenses.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Monthly Comparison */}
-          <div className="bg-black/40 backdrop-blur-lg border border-white/10 rounded-xl p-6">
-            <h3 className="text-xl font-bold mb-4 text-blue-400">Income vs Expenses</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyData}>
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Bar dataKey="income" fill="#00ff88" />
-                  <Bar dataKey="expenses" fill="#ff0088" />
+                <BarChart data={expenses} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{ fontSize: 12, fill: '#666' }}
+                    axisLine={{ stroke: '#e0e0e0' }}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 12, fill: '#666' }}
+                    axisLine={{ stroke: '#e0e0e0' }}
+                  />
+                  <Tooltip 
+                    formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Amount']}
+                    labelStyle={{ color: '#333' }}
+                    contentStyle={{ 
+                      backgroundColor: 'white', 
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    }}
+                  />
+                  <Bar 
+                    dataKey="value" 
+                    fill="#3b82f6"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
+
+          {/* AI Tips */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center mb-4">
+              <div className="bg-blue-50 p-2 rounded-lg mr-3">
+                <Brain className="w-5 h-5 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900">AI Money Tips</h3>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
+                <h4 className="font-medium text-green-800 mb-1">💡 Smart Saving</h4>
+                <p className="text-sm text-green-700">Try the 50-30-20 rule: 50% needs, 30% wants, 20% savings</p>
+              </div>
+              
+              <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+                <h4 className="font-medium text-blue-800 mb-1">📊 Expense Insight</h4>
+                <p className="text-sm text-blue-700">Your highest expense is {expenses.length > 0 ? expenses.reduce((max, exp) => exp.value > max.value ? exp : max).name : 'N/A'}. Consider optimizing this category.</p>
+              </div>
+              
+              <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-400">
+                <h4 className="font-medium text-purple-800 mb-1">🎯 Goal Setting</h4>
+                <p className="text-sm text-purple-700">Set up automatic transfers to savings accounts to build wealth consistently</p>
+              </div>
+              
+              <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-400">
+                <h4 className="font-medium text-orange-800 mb-1">⚠️ Budget Alert</h4>
+                <p className="text-sm text-orange-700">Track daily expenses to identify small spending leaks in your budget</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* AI Insights */}
-        <div className="bg-black/40 backdrop-blur-lg border border-purple-500/20 rounded-xl p-6">
-          <div className="flex items-center mb-4">
-            <Bot className="w-6 h-6 text-purple-400 mr-2" />
-            <h3 className="text-xl font-bold text-purple-400">AI Financial Advisor</h3>
+        {/* AI Financial Insights */}
+        {aiInsights && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
+            <div className="flex items-center mb-6">
+              <Brain className="w-6 h-6 text-blue-600 mr-3" />
+              <h3 className="text-xl font-medium text-gray-900">AI Financial Analysis</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Spending Analysis */}
+              <div>
+                <h4 className="text-lg font-medium text-gray-900 mb-4">Spending Insights</h4>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-3">💰</span>
+                      <div>
+                        <p className="font-medium text-gray-900">Savings Rate</p>
+                        <p className="text-sm text-gray-600">{aiInsights.analysis.savingsRate}% of income</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-3">📈</span>
+                      <div>
+                        <p className="font-medium text-gray-900">Top Expense Category</p>
+                        <p className="text-sm text-gray-600">{aiInsights.analysis.highestCategory}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* AI Recommendations */}
+              <div>
+                <h4 className="text-lg font-medium text-gray-900 mb-4">Recommendations</h4>
+                <div className="space-y-3">
+                  {aiInsights.advice.slice(0, 3).map((tip: string, index: number) => (
+                    <div key={index} className="flex items-start p-4 bg-gray-50 rounded-lg">
+                      <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-gray-700">{tip}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            {/* Financial Health Score */}
+            <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-lg font-medium text-gray-900">Financial Health Score</h4>
+                  <p className="text-sm text-gray-600">Based on your spending and savings patterns</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-medium text-blue-600">{aiInsights.analysis.healthScore}/10</div>
+                  <p className="text-sm text-gray-600">
+                    {aiInsights.analysis.healthScore >= 7 ? '🟢 Excellent' : 
+                     aiInsights.analysis.healthScore >= 5 ? '🟡 Good' : '🔴 Needs Improvement'}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="space-y-3">
-            <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
-              <p className="text-sm">💡 <strong>Smart Tip:</strong> You spent ₹900 more on food this month. Consider cooking at home 2 more days per week to save ₹600 monthly.</p>
-            </div>
-            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-              <p className="text-sm">✅ <strong>Good Job:</strong> Your savings increased by 15% compared to last month. Keep it up!</p>
-            </div>
-            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-              <p className="text-sm">⚠️ <strong>Alert:</strong> Transport expenses are 25% higher than recommended. Try using public transport twice a week.</p>
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* Quick Actions */}
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button className="bg-green-500/20 border border-green-500/30 rounded-lg p-4 hover:bg-green-500/30 transition-all">
-            <span className="text-green-400 font-semibold">Add Expense</span>
-          </button>
-          <button className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-4 hover:bg-blue-500/30 transition-all">
-            <span className="text-blue-400 font-semibold">Set Budget</span>
-          </button>
-          <button className="bg-purple-500/20 border border-purple-500/30 rounded-lg p-4 hover:bg-purple-500/30 transition-all">
-            <span className="text-purple-400 font-semibold">AI Advice</span>
-          </button>
-          <button 
-            onClick={downloadReport}
-            className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4 hover:bg-yellow-500/30 transition-all"
-          >
-            <span className="text-yellow-400 font-semibold">Download Report</span>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <a href="/expenses" className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center hover:shadow-md transition-shadow group">
+            <div className="bg-green-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-green-100 transition-colors">
+              <Plus className="w-6 h-6 text-green-600" />
+            </div>
+            <span className="font-medium text-gray-900">Add Expense</span>
+          </a>
+          
+          <a href="/goals" className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center hover:shadow-md transition-shadow group">
+            <div className="bg-blue-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-100 transition-colors">
+              <Target className="w-6 h-6 text-blue-600" />
+            </div>
+            <span className="font-medium text-gray-900">Set Goals</span>
+          </a>
+          
+          <a href="/ai-advice" className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center hover:shadow-md transition-shadow group">
+            <div className="bg-purple-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-100 transition-colors">
+              <Brain className="w-6 h-6 text-purple-600" />
+            </div>
+            <span className="font-medium text-gray-900">AI Advisor</span>
+          </a>
+          
+          <button onClick={downloadReport} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center hover:shadow-md transition-shadow group">
+            <div className="bg-orange-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-100 transition-colors">
+              <Download className="w-6 h-6 text-orange-600" />
+            </div>
+            <span className="font-medium text-gray-900">Download Report</span>
           </button>
         </div>
       </div>

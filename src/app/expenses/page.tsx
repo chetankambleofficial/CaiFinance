@@ -79,107 +79,111 @@ export default function Expenses() {
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
-              Daily Expenses
-            </h1>
-            <p className="text-gray-400">Track your daily spending</p>
+            <h1 className="text-3xl font-normal text-gray-900 mb-2">Expenses</h1>
+            <p className="text-gray-600">Track your daily spending</p>
           </div>
           <button
             onClick={() => setShowForm(true)}
-            className="bg-green-500/20 border border-green-500/30 rounded-lg px-6 py-3 hover:bg-green-500/30 transition-all flex items-center gap-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4" />
             Add Expense
           </button>
         </div>
 
         {/* Summary Card */}
-        <div className="bg-black/40 backdrop-blur-lg border border-white/10 rounded-xl p-6 mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-400 text-sm">Total This Month</p>
-              <p className="text-3xl font-bold text-red-400">₹{totalExpenses.toLocaleString()}</p>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="flex items-center">
+            <div className="bg-red-50 p-3 rounded-full mr-4">
+              <Wallet className="w-6 h-6 text-red-600" />
             </div>
-            <Wallet className="w-12 h-12 text-red-400" />
+            <div>
+              <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Total This Month</p>
+              <p className="text-2xl font-normal text-gray-900">₹{totalExpenses.toLocaleString()}</p>
+            </div>
           </div>
         </div>
 
         {/* Add Expense Form */}
         {showForm && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-black/80 backdrop-blur-lg border border-white/20 rounded-xl p-6 w-full max-w-md mx-4">
-              <h3 className="text-xl font-bold mb-4 text-green-400">{editingId ? 'Edit Expense' : 'Add New Expense'}</h3>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Amount (₹)</label>
-                  <input
-                    type="number"
-                    value={formData.amount}
-                    onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-2 focus:border-green-400 focus:outline-none"
-                    placeholder="Enter amount"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Category</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-2 focus:border-green-400 focus:outline-none"
-                  >
-                    {categories.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Payment Type</label>
-                  <select
-                    value={formData.paymentType}
-                    onChange={(e) => setFormData({...formData, paymentType: e.target.value})}
-                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-2 focus:border-green-400 focus:outline-none"
-                  >
-                    {paymentTypes.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Note</label>
-                  <input
-                    type="text"
-                    value={formData.note}
-                    onChange={(e) => setFormData({...formData, note: e.target.value})}
-                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-2 focus:border-green-400 focus:outline-none"
-                    placeholder="What did you buy?"
-                  />
-                </div>
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="submit"
-                    className="flex-1 bg-green-500/20 border border-green-500/30 rounded-lg py-2 hover:bg-green-500/30 transition-all"
-                  >
-                    {editingId ? 'Update Expense' : 'Add Expense'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowForm(false)
-                      setEditingId(null)
-                      setFormData({ amount: '', category: 'Food', note: '', paymentType: 'UPI' })
-                    }}
-                    className="flex-1 bg-gray-500/20 border border-gray-500/30 rounded-lg py-2 hover:bg-gray-500/30 transition-all"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
+              <div className="p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  {editingId ? 'Edit Expense' : 'Add New Expense'}
+                </h3>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Amount (₹)</label>
+                    <input
+                      type="number"
+                      value={formData.amount}
+                      onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Enter amount"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData({...formData, category: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      {categories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+                    <select
+                      value={formData.paymentType}
+                      onChange={(e) => setFormData({...formData, paymentType: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      {paymentTypes.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <input
+                      type="text"
+                      value={formData.note}
+                      onChange={(e) => setFormData({...formData, note: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="What did you buy?"
+                    />
+                  </div>
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors"
+                    >
+                      {editingId ? 'Update Expense' : 'Add Expense'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForm(false)
+                        setEditingId(null)
+                        setFormData({ amount: '', category: 'Food', note: '', paymentType: 'UPI' })
+                      }}
+                      className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         )}
@@ -187,42 +191,50 @@ export default function Expenses() {
         {/* Expenses List */}
         <div className="space-y-4">
           {expenses.map((expense) => (
-            <div key={expense.id} className="bg-black/40 backdrop-blur-lg border border-white/10 rounded-xl p-4">
+            <div key={expense.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-500 rounded-lg flex items-center justify-center">
-                    <Tag className="w-6 h-6 text-white" />
+                  <div className="bg-blue-50 w-12 h-12 rounded-lg flex items-center justify-center">
+                    <Tag className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg">₹{expense.amount}</h3>
-                    <p className="text-gray-400 text-sm">{expense.category} • {expense.paymentType}</p>
-                    <p className="text-gray-500 text-xs">{expense.note}</p>
+                    <h3 className="font-medium text-gray-900">₹{expense.amount.toLocaleString()}</h3>
+                    <p className="text-sm text-gray-600">{expense.category} • {expense.paymentType}</p>
+                    <p className="text-sm text-gray-500">{expense.note || 'No description'}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="text-right">
-                    <p className="text-sm text-gray-400 flex items-center gap-1">
+                  <div className="text-right mr-4">
+                    <p className="text-sm text-gray-500 flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
                       {new Date(expense.date).toLocaleDateString()}
                     </p>
                   </div>
                   <button 
                     onClick={() => handleEdit(expense)}
-                    className="p-2 hover:bg-blue-500/20 rounded-lg transition-all"
+                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                   >
-                    <Edit className="w-4 h-4 text-blue-400" />
+                    <Edit className="w-4 h-4" />
                   </button>
                   <button 
                     onClick={() => handleDelete(expense.id)}
-                    className="p-2 hover:bg-red-500/20 rounded-lg transition-all"
+                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   >
-                    <Trash2 className="w-4 h-4 text-red-400" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
+
+        {expenses.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">💸</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No expenses yet</h3>
+            <p className="text-gray-600">Start tracking your expenses by adding your first entry</p>
+          </div>
+        )}
       </div>
     </div>
   )
