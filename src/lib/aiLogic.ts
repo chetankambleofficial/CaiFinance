@@ -7,7 +7,7 @@ export function analyzeSpending(expenses: any[], monthlyIncome: number, monthlyR
     return acc
   }, {})
   
-  const totalExpenses = Object.values(categoryTotals).reduce((sum: any, amount: any) => sum + amount, 0) + monthlyRent
+  const totalExpenses = (Object.values(categoryTotals) as number[]).reduce((sum: number, amount: number) => sum + amount, 0) + monthlyRent
   const savings = monthlyIncome - totalExpenses
   const savingsRate = Math.round((savings / monthlyIncome) * 100)
   
