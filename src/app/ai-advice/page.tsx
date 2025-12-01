@@ -47,7 +47,7 @@ export default function AIAdvice() {
       let aiResponse = ''
 
       if (inputMessage.toLowerCase().includes('budget')) {
-        aiResponse = AIFinancialAdvisor.generatePersonalizedAdvice(data.expenses, data.user.monthlyIncome)
+        aiResponse = AIFinancialAdvisor.generatePersonalizedAdvice(data.expenses as any, data.user.monthlyIncome)
       } else if (inputMessage.toLowerCase().includes('save')) {
         aiResponse = AIFinancialAdvisor.getFinancialTip('savings')
       } else if (inputMessage.toLowerCase().includes('emergency')) {
